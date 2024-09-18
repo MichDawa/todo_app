@@ -32,9 +32,15 @@ class NoteController extends AbstractController
      */
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json('Invalid JSON', Response::HTTP_BAD_REQUEST);
+        }
+
         $note = new Note();
         $form = $this->createForm(NoteType::class, $note);
-        $form->handleRequest($request);
+        $form->submit($data);  // Submit the data to the form manually
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($note);
@@ -49,22 +55,33 @@ class NoteController extends AbstractController
     /**
      * @Route("/{id}", name="app_note_show", methods={"GET"})
      */
-    public function show(Note $note, EntityManagerInterface $entityManager): Response
+    public function show(int $id, NoteRepository $noteRepository): Response
     {
+        $note = $noteRepository->find($id);
+
+        if (!$note) {
+            return $this->json(['error' => 'Note not found'], Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($note);
     }
 
     /**
      * @Route("/{id}/edit", name="app_note_edit", methods={"PUT"})
      */
-    public function edit(Request $request, Note $note, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, int $id, NoteRepository $noteRepository, EntityManagerInterface $entityManager): Response
     {
+        $note = $noteRepository->find($id);
+
+        if (!$note) {
+            return $this->json(['error' => 'Note not found'], Response::HTTP_NOT_FOUND);
+        }
+
         $form = $this->createForm(NoteType::class, $note);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->json($note);
         }
 
@@ -74,16 +91,17 @@ class NoteController extends AbstractController
     /**
      * @Route("/{id}", name="app_note_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Note $note, EntityManagerInterface $entityManager): Response
+    public function delete(int $id, NoteRepository $noteRepository, EntityManagerInterface $entityManager): Response
     {
+        $note = $noteRepository->find($id);
+
+        if (!$note) {
+            return $this->json(['error' => 'Note not found'], Response::HTTP_NOT_FOUND);
+        }
+
         $entityManager->remove($note);
         $entityManager->flush();
 
         return $this->json('Note deleted', Response::HTTP_NO_CONTENT);
     }
-
-
-
-
-
 }

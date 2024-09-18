@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\NoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=NoteRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\NoteRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Note
 {
@@ -32,11 +32,6 @@ class Note
      */
     private $createdAt;
 
-    public function __construct()
-    {
-        $this->createdAt = new \DateTime();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -47,7 +42,7 @@ class Note
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -69,5 +64,23 @@ class Note
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedAtValue(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTime();
+        }
+
     }
 }
