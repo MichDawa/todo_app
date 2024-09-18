@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="App\Repository\NoteRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class Note
+class Note implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -82,5 +82,15 @@ class Note
             $this->createdAt = new \DateTime();
         }
 
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+            'createdAt' => $this->getCreatedAt(),
+        ];
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route("/note")
@@ -30,7 +31,7 @@ class NoteController extends AbstractController
     /**
      * @Route("/new", name="app_note_new", methods={"POST"})
      */
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
         $data = json_decode($request->getContent(), true);
 
@@ -46,7 +47,8 @@ class NoteController extends AbstractController
             $entityManager->persist($note);
             $entityManager->flush();
 
-            return $this->json($note);
+            $jsonData = $serializer->serialize($note, 'json');
+            return new Response($jsonData, Response::HTTP_OK, ['Content-Type' => 'application/json']);
         }
 
         return $this->json('Invalid data', Response::HTTP_BAD_REQUEST);
