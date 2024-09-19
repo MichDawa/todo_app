@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\NoteRepository")
@@ -18,12 +19,13 @@ class Note implements \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max=255)
      */
     private $title;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $content;
 
@@ -31,6 +33,23 @@ class Note implements \JsonSerializable
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+    * @Assert\Callback
+    */
+    public function validateContentAndTitle($context)
+    {
+        if (empty($this->title) && empty($this->content)) {
+            $context->buildViolation('Title or Content should be provided.')
+                ->atPath('title')
+                ->addViolation();
+
+                $context->buildViolation('Title or Content should be provided.')
+                ->atPath('content')
+                ->addViolation();
+        }
+    }
+
 
     public function getId(): ?int
     {

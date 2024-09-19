@@ -23,6 +23,7 @@ class NoteController extends AbstractController
      */
     public function index(EntityManagerInterface $entityManager): Response
     {
+
         $notes = $entityManager->getRepository(Note::class)->findAll();
 
         return $this->json($notes);
@@ -41,7 +42,7 @@ class NoteController extends AbstractController
 
         $note = new Note();
         $form = $this->createForm(NoteType::class, $note);
-        $form->submit($data);  // Submit the data to the form manually
+        $form->submit($data);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($note);
