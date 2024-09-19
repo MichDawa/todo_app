@@ -5,4 +5,5 @@
 4. php bin/console doctrine:database:create
 5. php bin/console make:migration
 6. php bin/console doctrine:migrations:migrate
-7. symfony serve, use postman for testing
+7. symfony serve
+8. Use postman for testing
