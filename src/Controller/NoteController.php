@@ -7,6 +7,7 @@ use App\Form\NoteType;
 use App\Repository\NoteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,8 +45,7 @@ class NoteController extends AbstractController
         $form = $this->createForm(NoteType::class, $note);
         $form->submit($data);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $entityManager->persist($note);
             $entityManager->flush();
@@ -72,9 +72,9 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="app_note_edit", methods={"PUT"})
+     * @Route("/{id}/edit", name="app_note_edit", methods={"PUT", "PATCH"})
      */
-    public function edit(Request $request, int $id, NoteRepository $noteRepository, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, int $id, NoteRepository $noteRepository, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
     {
         $note = $noteRepository->find($id);
 
@@ -82,15 +82,26 @@ class NoteController extends AbstractController
             return $this->json(['error' => 'Note not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $form = $this->createForm(NoteType::class, $note);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            return $this->json($note);
+        if (!$data) {
+            return $this->json(['error' => 'Invalid input data'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json('Invalid data', Response::HTTP_BAD_REQUEST);
+        $form = $this->createForm(NoteType::class, $note);
+        $form->submit($data, false);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->json($note, Response::HTTP_OK);
+        }
+
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
     }
 
     /**
