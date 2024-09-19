@@ -1,3 +1,4 @@
+[SYMFONY BACKEND AFTER PULL]
 1. composer install
 2. edit DATABASE URL in .env with DATABASE_URL="mysql://[USERNAME HERE]:[PASSWORD HERE]@127.0.0.1:3306/[DB NAME HERE]?serverVersion=mariadb-10.4.32&charset=utf8mb4"
 3. php bin/console doctrine:database:create
