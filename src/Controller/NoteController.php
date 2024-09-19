@@ -44,7 +44,9 @@ class NoteController extends AbstractController
         $form = $this->createForm(NoteType::class, $note);
         $form->submit($data);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
+
             $entityManager->persist($note);
             $entityManager->flush();
 

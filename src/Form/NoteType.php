@@ -14,12 +14,12 @@ class NoteType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'required' => false,  // Make title optional in the form
-                'attr' => ['placeholder' => 'Enter your note title']
+                'required' => false,  //title optional
+                'attr' => ['placeholder' => 'Title']
             ])
             ->add('content', TextType::class, [
-                'required' => false,  // Make content optional in the form
-                'attr' => ['placeholder' => 'Enter your note content']
+                'required' => false,  //content optional
+                'attr' => ['placeholder' => "What's on your mind?"]
             ]);
     }
 
