@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=NoteRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\NoteRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
-class Note
+class Note implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -18,12 +19,13 @@ class Note
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max=255)
      */
     private $title;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $content;
 
@@ -32,10 +34,22 @@ class Note
      */
     private $createdAt;
 
-    public function __construct()
+    /**
+    * @Assert\Callback
+    */
+    public function validateContentAndTitle($context)
     {
-        $this->createdAt = new \DateTime();
+        if (empty($this->title) && empty($this->content)) {
+            $context->buildViolation('Title or Content should be provided.')
+                ->atPath('title')
+                ->addViolation();
+
+                $context->buildViolation('Title or Content should be provided.')
+                ->atPath('content')
+                ->addViolation();
+        }
     }
+
 
     public function getId(): ?int
     {
@@ -47,7 +61,7 @@ class Note
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -69,5 +83,33 @@ class Note
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedAtValue(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTime();
+        }
+
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+            'createdAt' => $this->getCreatedAt(),
+        ];
     }
 }
