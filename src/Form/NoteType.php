@@ -27,7 +27,7 @@ class NoteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Note::class,
-            'csrf_protection' => false,  // Disable CSRF for API requests
+            'csrf_protection' => false,
         ]);
     }
 }
