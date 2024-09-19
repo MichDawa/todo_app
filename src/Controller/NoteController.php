@@ -90,6 +90,7 @@ class NoteController extends AbstractController
 
         $form = $this->createForm(NoteType::class, $note);
         $form->submit($data, false);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
@@ -118,6 +119,6 @@ class NoteController extends AbstractController
         $entityManager->remove($note);
         $entityManager->flush();
 
-        return $this->json('Note deleted', Response::HTTP_NO_CONTENT);
+        return $this->json('Note deleted', Response::HTTP_OK);
     }
 }
