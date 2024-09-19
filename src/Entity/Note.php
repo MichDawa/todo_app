@@ -43,10 +43,6 @@ class Note implements \JsonSerializable
             $context->buildViolation('Title or Content should be provided.')
                 ->atPath('title')
                 ->addViolation();
-
-                $context->buildViolation('Title or Content should be provided.')
-                ->atPath('content')
-                ->addViolation();
         }
     }
 
@@ -105,11 +101,12 @@ class Note implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return [
+        return
+        [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
             'content' => $this->getContent(),
-            'createdAt' => $this->getCreatedAt(),
+            'createdAt' => $this->getCreatedAt() ? $this->getCreatedAt()->format('m-d-Y h:i A') : null,
         ];
     }
 }

@@ -30,4 +30,5 @@ class NoteType extends AbstractType
             'csrf_protection' => false,
         ]);
     }
+
 }

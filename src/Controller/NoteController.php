@@ -54,7 +54,12 @@ class NoteController extends AbstractController
             return new Response($jsonData, Response::HTTP_OK, ['Content-Type' => 'application/json']);
         }
 
-        return $this->json('Invalid data', Response::HTTP_BAD_REQUEST);
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        return $this->json($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
